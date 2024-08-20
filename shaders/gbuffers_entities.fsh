@@ -1,3 +1,3 @@
-#include "basic_frag.glsl"
-
 #define GBUFFERS_ENTITIES
+
+#include "basic_frag.glsl"

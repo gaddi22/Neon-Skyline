@@ -1,4 +1,4 @@
-#version 460
+#version 460 
 
 //VSH files are processed per vertex. 
 //Position inputs start in model space while the render wants them in clip space
@@ -8,7 +8,6 @@ uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 gbufferModelViewInverse;
 uniform vec3 chunkOffset;               //required to render terrain textures. if it is not terrain, this is zero making it safe for other vsh files
-uniform vec3 cameraPosition;            //gives player position in world space
 
 in vec3 vaPosition; //vertex position
 in vec2 vaUV0;      //texture coordinates
@@ -20,7 +19,7 @@ out vec3 foliageColor;
 out vec2 lightMapCoords;
 
 //Entity checking
-#if defined(GBUFFERS_ENTITIES)
+#ifdef GBUFFERS_ENTITIES
 uniform int entityId;
 flat out int entityMask;
 #endif
@@ -32,9 +31,13 @@ void main(){
     lightMapCoords = vaUV2 * (1.0 / 256.0) + (1.0 / 32.0);
 
     //convert from model space to clip space
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(vaPosition + chunkOffset,1);   //gl_position: expected output of vsh file. position on screenc //1: perspective
+    // gl_Position = ftransform();
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(vaPosition + chunkOffset,1);   //gl_position: expected output of vsh file. position on screen //1: perspective
     
-    #if defined(GBUFFERS_ENTITIES)
+    #ifdef GBUFFERS_ENTITIES
+
 	entityMask = entityId;
+    #else
+
 	#endif
 }

@@ -1,15 +1,16 @@
-#version 460 compatibility
+#version 460 
 
 uniform sampler2D colortex0;
-in vec4 colortex1; //entity
+uniform sampler2D colortex1;
+uniform sampler2D colortex2;
+uniform sampler2D colortex3; //entity
 uniform float viewHeight;
 uniform float viewWidth;
 
 in vec2 texCoord;
 
-/* DRAWBUFFERS:0 */
+/* DRAWBUFFERS */
 layout(location = 0) out vec4 color;
-
 
 /*  Radar Colors */
 vec3 ENEMY = vec3(1.0,0.0,0.0);
@@ -50,21 +51,23 @@ void main() {
     float edge_intensity = length(sobel.rgb);
 
     // Set the color based on the edge intensity
-    int entity = int(colortex1.a);
+    float entity = texture2D(colortex3,texCoord).r;
+    if (entity > 0.01 && entity < 1) discard;
+
 
     if (edge_intensity > edge_threshold) {// Edge detected
-        if(entity == 1) {
+        if(entity == .1) {
             color = vec4(ENEMY, 1.0);
         }
-        else if(entity == 2) {
+        else if(entity == .2) {
             color = vec4(FRIENDLY, 1.0);
         }
-        else if(entity == 3) {
+        else if(entity == .3) {
             color = vec4(PLAYER, 1.0);
         } else {
             color = vec4(TERRAIN,1.0);
         }
     } else {
-        color = texture(colortex0,texCoord); // No edge detected, transparent
+        color = texture(colortex0,texCoord); // No edge detected
     }
 }

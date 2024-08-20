@@ -8,12 +8,11 @@ uniform sampler2D lightmap; //texture of the lighting applied
 in vec2 texCoord;
 in vec3 foliageColor;
 in vec2 lightMapCoords;
-flat in int entityMask;
 
-out vec4 fragColor;
+// out vec4 fragColor;
 
 //entities
-#if defined(GBUFFERS_ENTITIES)
+#ifdef GBUFFERS_ENTITIES
 flat in int entityMask;
 #endif
 
@@ -32,17 +31,14 @@ void main() {
         discard;
     }
 
-    // outColor0 = vec4(1);    //puts 1 for all values, creating a white pixel with full visibility
-    fragColor = pow(vec4(outputColor,transparency),vec4(1/2.2));
-
-    int entity = 0;
-    #if defined(GBUFFERS_ENTITIES)
-    entity = entityMask == 1 ? 1 : entity; // Hostile mobs
-    entity = entityMask == 2 ? 2 : entity; // Friendly mobs
-    entity = entityMask == 3 ? 3 : entity; // Players
+    float entity = 0;
+    #ifdef GBUFFERS_ENTITIES
+    entity = entityMask == 1 ? 0.1 : entity; // Hostile mobs
+    entity = entityMask == 2 ? 0.2 : entity; // Friendly mobs
+    entity = entityMask == 3 ? 0.3 : entity; // Players
 	#endif
 
-    if (entity == 0) discard;
-
-    gl_FragData[1] = vec4(0,0,0,entity);
+    // outColor0 = vec4(1);    //puts 1 for all values, creating a white pixel with full visibility
+    gl_FragData[0] = pow(vec4(outputColor,transparency),vec4(1/2.2));
+    gl_FragData[1] = vec4(entity);
 }
