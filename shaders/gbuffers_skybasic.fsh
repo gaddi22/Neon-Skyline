@@ -26,8 +26,11 @@ vec3 screenToView(vec3 screenPos) {
 	return tmp.xyz / tmp.w;
 }
 
-/* DRAWBUFFERS:0 */
+/* DRAWBUFFERS: 0,3 */
+/* RENDERTARGETS: 0,3 */
+
 layout(location = 0) out vec4 color;
+layout(location = 1) out vec4 typeData;
 
 void main() {
 	if (starData.a > 0.5) {
@@ -36,4 +39,6 @@ void main() {
 		vec3 pos = screenToView(vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), 1.0));
 		color = vec4(calcSkyColor(normalize(pos)), 1.0);
 	}
+	typeData = vec4(0.9,0.0,0.0,1.0);
+	// typeData = vec4(0.0,0.0,0.0,1.0);
 }
