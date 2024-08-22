@@ -65,21 +65,20 @@ void main() {
         color = texture(colortex0,texCoord);
         return;
     }
+
     // Edge detection from Hebali/GlslSobel.frag
     vec4 n[9];
     if(entity > entity_min && entity < entity_max) {
         make_kernel(n, colortex2, texCoord, viewWidth, viewHeight);
-        // for(int i = 0; i<9;i++){
-        //     n[i] *= pow(2,2) * (lightData.r + .001);
-        // }
+    }
+    else if(entity > 0.001 && entity < 0.02 ){  //distant horizons has no depth
+        make_kernel(n, colortex0, texCoord, viewWidth, viewHeight);
+
     }
     else{
         make_kernel(n, depthtex0, texCoord, viewWidth, viewHeight);
         for(int i = 0; i<9;i++){
-            // n[i] = (n[i] * (lightData.r) + ( n[i] * (depth))  );
             n[i] *= ((lightData.r)) * (depth/2);
-            // n[i] = (n[i] * (lightData.r) * (depth));
-
         }
     }
 
@@ -92,6 +91,7 @@ void main() {
     // Threshold to determine if an edge is present
     float edge_threshold; // You can adjust this value
     if(entity > entity_min && entity < entity_max) edge_threshold = 0.2;
+    else if(entity > 0.001 && entity < 0.02) edge_threshold = .08;
     else edge_threshold = .01;
 
     float edge_intensity = length(sobel.rgb);

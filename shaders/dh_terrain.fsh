@@ -25,7 +25,6 @@ void main() {
     float lightIntensityInv = 1 - ((lightIntensityVec.r + lightIntensityVec.g + lightIntensityVec.b) / 3.0);
 
 
-
     //apply colors from texture location
     vec4 outputColorData = blockColor;
     vec3 outputColor = pow(outputColorData.rgb, vec3(2.2)) * (lightColor - 0.04 );
@@ -36,45 +35,30 @@ void main() {
         discard;
     }
 
-    // outColor0 = vec4(1);    //puts 1 for all values, creating a white pixel with full visibility
-
-    //through out dh_blocks if they are not exposed
+    //throw out dh_blocks if they are not exposed
     vec2 texCoord = gl_FragCoord.xy / vec2(viewWidth,viewHeight);
     float depth = texture(depthtex0,texCoord).r;
     if(depth != 1.0){
         discard;
     }
 
-    // Sample the depth texture at the fragment's screen-space coordinates
-    // vec2 texCoord = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-    // float depth = texture(depthtex0, texCoord).r;
-
-    // // Compare the sampled depth with the current fragment's depth
-    // // This assumes the depth values are linear and comparable directly
-    // if (depth != gl_FragCoord.z) {
-    //     discard;  // Discard fragments that are behind others
-    // }
-
     //use fog to maske the off color from distant horizons
     float distanceFromCamera = distance(vec3(0), viewSpacePosition);
 
     float maxFogDistance = 4000;
-    float minFogDistance = 300;
-    // float maxFogDistance = 400;
-    // float minFogDistance = 300;
-
+    float minFogDistance = 3000;
 
     float fogBlendValue = clamp((distanceFromCamera - minFogDistance)/ (maxFogDistance - minFogDistance),0,1);
 
+    outputColor *= 0.2;
     outputColor = mix(outputColor, pow(fogColor, vec3(2.2)), fogBlendValue);
 
     fragColor = pow(vec4(outputColor, transparency),vec4(1.0 / 2.2));
 
-    outputColorData = vec4(vec3((lightIntensityInv * outputColor)),1.0);
-
+    outputColorData = vec4(lightColor,1.0);
 
     gl_FragData[0] = pow(vec4(outputColor,transparency),vec4(1/2.2));   //original
-    gl_FragData[1] = outputColorData;                                   //no lighting
-    gl_FragData[2] = vec4(0.0,0.0,0.0,1.0);               //entity data
+    gl_FragData[1] = outputColorData;                                   //custom
+    gl_FragData[2] = vec4(0.01,0.0,0.0,1.0);               //entity data
 
 }
