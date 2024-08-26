@@ -37,7 +37,7 @@ void main() {
     float transparency = outputColorData.a;
 
     //if transparency is low, throw this fragment out so the one behind can be drawn
-    if(transparency < alphaTestRef){
+    if(transparency < 0.001){
         discard;
     }
 

@@ -27,7 +27,7 @@ void main() {
 
     //apply colors from texture location
     vec4 outputColorData = blockColor;
-    vec3 outputColor = pow(outputColorData.rgb, vec3(2.2)) * (lightColor - 0.04 );
+    vec3 outputColor = pow(outputColorData.rgb, vec3(2.2)) * (lightColor);
     float transparency = outputColorData.a;
 
     //if transparency is low, throw this fragment out so the one behind can be drawn
@@ -50,7 +50,7 @@ void main() {
 
     float fogBlendValue = clamp((distanceFromCamera - minFogDistance)/ (maxFogDistance - minFogDistance),0,1);
 
-    outputColor *= 0.2;
+    outputColor = (outputColor) * (1 - lightIntensityInv);
     outputColor = mix(outputColor, pow(fogColor, vec3(2.2)), fogBlendValue);
 
     fragColor = pow(vec4(outputColor, transparency),vec4(1.0 / 2.2));
