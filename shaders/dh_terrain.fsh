@@ -22,12 +22,13 @@ void main() {
     //pow operations linearize the values
     vec3 lightColor = pow(texture(lightmap,lightMapCoords).rgb,vec3(2.2));
     vec3 lightIntensityVec = lightColor / vec3(1/2.2);
-    float lightIntensityInv = 1 - ((lightIntensityVec.r + lightIntensityVec.g + lightIntensityVec.b) / 3.0);
+    float lightIntensity = ((lightIntensityVec.r + lightIntensityVec.g + lightIntensityVec.b) / 3.0);
+    float lightIntensityInv = 1 - lightIntensity;
 
 
     //apply colors from texture location
     vec4 outputColorData = blockColor;
-    vec3 outputColor = pow(outputColorData.rgb, vec3(2.2)) * (lightColor);
+    vec3 outputColor = pow(outputColorData.rgb, vec3(2.2)) * pow(lightColor,vec3(2.2));
     float transparency = outputColorData.a;
 
     //if transparency is low, throw this fragment out so the one behind can be drawn
@@ -42,15 +43,14 @@ void main() {
         discard;
     }
 
-    //use fog to maske the off color from distant horizons
+    //fog effect
     float distanceFromCamera = distance(vec3(0), viewSpacePosition);
 
     float maxFogDistance = 4000;
-    float minFogDistance = 3000;
+    float minFogDistance = 1000;
 
     float fogBlendValue = clamp((distanceFromCamera - minFogDistance)/ (maxFogDistance - minFogDistance),0,1);
 
-    outputColor = (outputColor) * (1 - lightIntensityInv);
     outputColor = mix(outputColor, pow(fogColor, vec3(2.2)), fogBlendValue);
 
     fragColor = pow(vec4(outputColor, transparency),vec4(1.0 / 2.2));
