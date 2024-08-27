@@ -21,8 +21,6 @@ flat in int entityMask;
 
 void main() {
 
-    
-    
     //lookup lightcolor in the light map and apply that color to the object
     //pow operations linearize the values
     vec3 lightColor = pow(texture(lightmap,lightMapCoords).rgb,vec3(2.2));
@@ -37,7 +35,7 @@ void main() {
     float transparency = outputColorData.a;
 
     //if transparency is low, throw this fragment out so the one behind can be drawn
-    if(transparency < 0.001){
+    if(transparency < alphaTestRef){
         discard;
     }
 

@@ -1,5 +1,7 @@
 #version 460 
 
+#include "settings.glsl"
+
 uniform sampler2D depthtex0;    //depthmap
 uniform sampler2D colortex0;    //vanilla-like
 uniform sampler2D colortex2;    //lighting/edge data
@@ -15,11 +17,16 @@ in vec2 texCoord;
 layout(location = 0) out vec4 color;
 
 /*  Radar Colors */
-vec3 ENEMY = vec3(1.0,0.0,0.0);
-vec3 PLAYER = vec3(0.0,1.0,0.0); 
-vec3 FRIENDLY = vec3(0.0,1.0,1.0); 
-vec3 ENTITY_DEFAULT = vec3(1.0,1.0,0.0); 
-vec3 TERRAIN = vec3(.3,.15,0.0);
+// vec3 ENEMY = vec3(1.0,0.0,0.0);
+// vec3 PLAYER = vec3(0.0,1.0,0.0); 
+// vec3 FRIENDLY = vec3(0.0,1.0,1.0); 
+// vec3 ENTITY_DEFAULT = vec3(1.0,1.0,0.0); 
+// vec3 TERRAIN = vec3(.3,.15,0.0);
+vec4 TERRAIN = GRND_COLOR;
+vec4 ENTITY_DEFAULT = UNKN_COLOR;
+vec4 PLAYER = PLYR_COLOR;
+vec4 FRIENDLY = FRND_COLOR;
+vec4 ENEMY = ENMY_COLOR;
 
 void make_kernel(inout vec4 n[9], sampler2D tex, vec2 coord, float width, float height)
 {
@@ -47,8 +54,8 @@ float linearizeDepthFast(float depth, float near, float far) {
 
 void main() {
 
-    float entity_min = 0.05;
-    float entity_max = 0.6;
+    const float entity_min = 0.05;
+    const float entity_max = 0.6;
 
     // Set the color based on the edge intensity
     float entity = texture(colortex3,texCoord).r;
@@ -92,24 +99,22 @@ void main() {
 
     // Threshold to determine if an edge is present
     float edge_threshold; // You can adjust this value
-    if(entity > entity_min && entity < entity_max) edge_threshold = 0.2;
-    else if(entity > 0.001 && entity < 0.02) edge_threshold = .5;
-    else edge_threshold = .01;
+    if(entity > entity_min && entity < entity_max) edge_threshold = ENT_SENS;
+    else if(entity > 0.001 && entity < 0.02) edge_threshold = DH_SENS;
+    else edge_threshold = GRND_SENS;
 
     float edge_intensity = length(sobel.rgb);
 
 
     if (edge_intensity > edge_threshold) {// Edge detected
-        if(entity > .05 && entity < 0.15) color = vec4(ENTITY_DEFAULT, 1.0);
-        else if(entity > .15 && entity < 0.25)color = vec4(ENEMY, 1.0);
-        else if(entity > .25 && entity < 0.35)color = vec4(FRIENDLY, 1.0);
-        else if(entity > .35 && entity < 0.45)color = vec4(PLAYER, 1.0);
-        else if(entity > .45 && entity < 0.55)color = vec4(0.0);            //shadow
-        else color = vec4(TERRAIN,1.0);
-    } else {
-        color = texture(colortex0,texCoord); // No edge detected
-        // color = texture(depthtex2,texCoord); // No edge detected
-    }
-
+        if(entity > .05 && entity < 0.15) color = ENTITY_DEFAULT;
+        else if(entity > .15 && entity < 0.25)color = ENEMY;
+        else if(entity > .25 && entity < 0.35)color = FRIENDLY;
+        else if(entity > .35 && entity < 0.45)color = PLAYER;
+        else if(entity > .45 && entity < 0.55)color = vec4(0.0);    //shadow
+        else color = TERRAIN;
+    } 
+ 
+    color = mix(texture(colortex0,texCoord), color, color.a);
     
 }
