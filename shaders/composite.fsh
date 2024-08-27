@@ -75,14 +75,7 @@ void main() {
 
     // Edge detection from Hebali/GlslSobel.frag
     vec4 n[9];
-    if(entity > entity_min && entity < entity_max) {
-        // make_kernel(n, colortex2, texCoord, viewWidth, viewHeight);
-        make_kernel(n, depthtex0, texCoord, viewWidth, viewHeight);
-        for(int i = 0; i<9;i++){
-            n[i] *= ((lightData.r)) * (depth/2);
-        }
-    }
-    else if(entity > 0.001 && entity < 0.02 ){  //distant horizons has no depth
+    if(entity > 0.001 && entity < 0.02 ){  //distant horizons has no depth
         make_kernel(n, colortex0, texCoord, viewWidth, viewHeight);
         for(int i = 0; i<9;i++){
             n[i] *= (0.1/(lightData.r));

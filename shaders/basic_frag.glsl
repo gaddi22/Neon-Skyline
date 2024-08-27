@@ -44,13 +44,9 @@ void main() {
     vec4 lightColorData;
 
     #ifdef GBUFFERS_ENTITIES
-        // lightFinal = lightIntensity;   //exagerate light difference to make them more obvious
-        // lightFinal = lightIntensityInv / 10;   //exagerate light difference to make them more obvious
-        // lightColorData = vec4(vec3(lightFinal),1.0);
-
+      
         if(entityMask == 4) transparency = 0.3;
-        
-        lightColorData =  vec4(lightIntensityInv);
+
 
 
         entity = 0.1;
@@ -59,16 +55,11 @@ void main() {
         entity = entityMask == 3 ? 0.4 : entity; // Players
         entity = entityMask == 4 ? 0.5 : entity; // Shadows
 
-    #else
-        lightColorData =  vec4(lightIntensityInv);
-	#endif
-
-    #ifdef GBUFFERS_SKYTEXTURED
-        entity = 0.4;
     #endif
+    lightColorData =  vec4(lightIntensityInv);
 
     #ifdef GBUFFERS_WEATHER 
-     entity = 1;
+        entity = 1;
     #endif
 
     #ifdef GBUFFERS_BEAM
@@ -77,6 +68,7 @@ void main() {
 
     //scale sun with rain
     #ifdef GBUFFERS_SKYTEXTURED
+        entity = 1;
         transparency *= (1/rainStrength) - 3;
     #endif
 
