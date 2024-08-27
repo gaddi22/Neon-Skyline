@@ -45,10 +45,12 @@ void main() {
 
     #ifdef GBUFFERS_ENTITIES
         // lightFinal = lightIntensity;   //exagerate light difference to make them more obvious
-        lightFinal = lightIntensityInv / 10;   //exagerate light difference to make them more obvious
-        lightColorData = vec4(vec3(lightFinal),1.0);
+        // lightFinal = lightIntensityInv / 10;   //exagerate light difference to make them more obvious
+        // lightColorData = vec4(vec3(lightFinal),1.0);
 
         if(entityMask == 4) transparency = 0.3;
+        
+        lightColorData =  vec4(lightIntensityInv);
 
 
         entity = 0.1;
