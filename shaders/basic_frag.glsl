@@ -47,13 +47,13 @@ void main() {
       
         if(entityMask == 4) transparency = 0.3;
 
-
-
         entity = 0.1;
         entity = entityMask == 1 ? 0.2 : entity; // Hostile mobs
         entity = entityMask == 2 ? 0.3 : entity; // Friendly mobs
         entity = entityMask == 3 ? 0.4 : entity; // Players
-        entity = entityMask == 4 ? 0.5 : entity; // Shadows
+        entity = entityMask == 4 ? 0.5 : entity; // Pickups
+        entity = entityMask == 5 ? 0.6 : entity; // Shadows
+
 
     #endif
     lightColorData =  vec4(lightIntensityInv);
@@ -66,7 +66,7 @@ void main() {
       transparency = 0.03;
     #endif
 
-    //scale sun with rain
+    //fade sun with rain
     #ifdef GBUFFERS_SKYTEXTURED
         entity = 1;
         transparency *= (1/rainStrength) - 3;

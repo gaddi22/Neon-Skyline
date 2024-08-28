@@ -27,6 +27,8 @@ vec4 ENTITY_DEFAULT = UNKN_COLOR;
 vec4 PLAYER = PLYR_COLOR;
 vec4 FRIENDLY = FRND_COLOR;
 vec4 ENEMY = ENMY_COLOR;
+vec4 PICKUP = PKUP_COLOR;
+
 
 void make_kernel(inout vec4 n[9], sampler2D tex, vec2 coord, float width, float height)
 {
@@ -55,7 +57,7 @@ float linearizeDepthFast(float depth, float near, float far) {
 void main() {
 
     const float entity_min = 0.05;
-    const float entity_max = 0.6;
+    const float entity_max = 0.7;
 
     // Set the color based on the edge intensity
     float entity = texture(colortex3,texCoord).r;
@@ -108,7 +110,8 @@ void main() {
         else if(entity > .15 && entity < 0.25)color = ENEMY;
         else if(entity > .25 && entity < 0.35)color = FRIENDLY;
         else if(entity > .35 && entity < 0.45)color = PLAYER;
-        else if(entity > .45 && entity < 0.55)color = vec4(0.0);    //shadow
+        else if(entity > .45 && entity < 0.55)color = PICKUP;
+        else if(entity > .55 && entity < 0.65)color = vec4(0.0);    //shadow
         else color = TERRAIN;
     } 
  
