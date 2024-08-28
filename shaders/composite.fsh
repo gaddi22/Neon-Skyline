@@ -17,11 +17,6 @@ in vec2 texCoord;
 layout(location = 0) out vec4 color;
 
 /*  Radar Colors */
-// vec3 ENEMY = vec3(1.0,0.0,0.0);
-// vec3 PLAYER = vec3(0.0,1.0,0.0); 
-// vec3 FRIENDLY = vec3(0.0,1.0,1.0); 
-// vec3 ENTITY_DEFAULT = vec3(1.0,1.0,0.0); 
-// vec3 TERRAIN = vec3(.3,.15,0.0);
 vec4 TERRAIN = GRND_COLOR;
 vec4 ENTITY_DEFAULT = UNKN_COLOR;
 vec4 PLAYER = PLYR_COLOR;
@@ -68,7 +63,7 @@ void main() {
     float far = gbufferProjection[3][2] / (gbufferProjection[2][2] + 1.0);
     float near = far * (gbufferProjection[2][2] + 1.0) / (gbufferProjection[2][2] - 1.0);
 
-    depth = linearizeDepthFast(depth, near, far);
+    float linear_depth = linearizeDepthFast(depth, near, far);
 
     if (entity > entity_max){ //things that should not be edgedetected (sky, weather)
         color = texture(colortex0,texCoord);
@@ -86,7 +81,7 @@ void main() {
     else{
         make_kernel(n, depthtex0, texCoord, viewWidth, viewHeight);
         for(int i = 0; i<9;i++){
-            n[i] *= ((lightData.r)) * (depth/2);
+            n[i] *= ((lightData.r)) * (linear_depth) * 2;
         }
     }
 
