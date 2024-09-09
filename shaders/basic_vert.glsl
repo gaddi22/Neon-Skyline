@@ -21,6 +21,9 @@ out vec2 lightMapCoords;
 //Entity checking
 #ifdef GBUFFERS_ENTITIES
 uniform int entityId;
+in uniform vec3 shadowLightPosition;
+
+out float shadow_light_strength;
 flat out int entityMask;
 #endif
 
@@ -35,7 +38,7 @@ void main(){
     gl_Position = projectionMatrix * modelViewMatrix * vec4(vaPosition + chunkOffset,1);   //gl_position: expected output of vsh file. position on screen //1: perspective
     
     #ifdef GBUFFERS_ENTITIES
-
+    shadow_light_strength = max(dot(shadowLightPosition, vec3(0, 1, 0)), 0.1);
 	entityMask = entityId;
     #else
 

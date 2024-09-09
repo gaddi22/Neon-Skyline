@@ -16,6 +16,7 @@ in vec2 lightMapCoords;
 
 //entities
 #ifdef GBUFFERS_ENTITIES
+in float shadow_light_strength;
 flat in int entityMask;
 #endif
 
@@ -27,7 +28,6 @@ void main() {
     vec3 lightIntensityVec = lightColor / vec3(1/2.2);
     float lightIntensity = (lightIntensityVec.r + lightIntensityVec.g + lightIntensityVec.b) / 3.0;
     float lightIntensityInv = 1 - lightIntensity;
-    float lightFinal;
 
     //apply colors from texture location
     vec4 outputColorData = pow(texture(gtexture,texCoord),vec4(2.2));
@@ -44,8 +44,10 @@ void main() {
     vec4 lightColorData;
 
     #ifdef GBUFFERS_ENTITIES
-      
-        if(entityMask == 4) transparency = 0.3;
+
+        //Entity lighting
+        outputColor *= pow(shadow_light_strength,1/2.2);
+        if(entityMask == 5) transparency = 0.3; //shadow transparency
 
         entity = 0.1;
         entity = entityMask == 1 ? 0.2 : entity; // Hostile mobs
