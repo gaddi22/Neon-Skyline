@@ -3,7 +3,7 @@
 //FSH runs for each "pixel"
 
 //Drawbuffers store data for our shader going forward\
-/* RENDERTARGETS: 0,2,3*/
+/* RENDERTARGETS: 0,2,3 */
 out vec4 fragColor;
 
 uniform sampler2D lightmap; //texture of the lighting applied
@@ -11,7 +11,6 @@ uniform sampler2D depthtex0;
 uniform float viewHeight;
 uniform float viewWidth;
 uniform vec3 fogColor;
-// uniform sampler2D normals;
 
 in vec2 lightMapCoords;
 in vec4 blockColor;
@@ -48,7 +47,7 @@ void main() {
     float distanceFromCamera = distance(vec3(0), viewSpacePosition);
 
     float maxFogDistance = 4000;
-    float minFogDistance = 1000;
+    float minFogDistance = 100;
 
     float fogBlendValue = clamp((distanceFromCamera - minFogDistance)/ (maxFogDistance - minFogDistance),0,1);
 
@@ -56,12 +55,10 @@ void main() {
 
     fragColor = pow(vec4(outputColor, transparency),vec4(1.0 / 2.2));
 
-	// vec3 normal = texture(normals, texCoord).xyz;
     float fragmentType = 0.01;
 
     gl_FragData[0] = pow(vec4(outputColor,transparency),vec4(1/2.2));   //original
     gl_FragData[1] = vec4(lightIntensityInv);                           //Light Data
-    gl_FragData[2] = vec4(fragmentType,vec3(0.0));                      //frag data
-    // gl_FragData[3] = vec4(normal,0.0);                                 //normal
+    gl_FragData[2] = vec4(fragmentType,fogBlendValue,vec2(0.0));   //frag data
 
 }

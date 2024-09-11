@@ -6,7 +6,6 @@ uniform sampler2D depthtex0;    //depthmap
 uniform sampler2D colortex0;    //vanilla-like
 uniform sampler2D colortex2;    //lighting/edge data
 uniform sampler2D colortex3;    //fragment type
-uniform sampler2D colortex4;    //normal (vec3)
 uniform float viewHeight;
 uniform float viewWidth;
 
@@ -34,12 +33,13 @@ float linearizeDepth(float depth, float near, float far) {
     return (2.0 * near) / (far + near - depth * (far - near));
 }
 
-// const float n[9] = float[](-1.0, -1.0, -1.0, -1.0, 8.0, -1.0, -1.0, -1.0, -1.0);
-const float n[9] = float[](1.0, 1.0, 1.0, 1.0, -8.0, 1.0, 1.0, 1.0, 1.0);
+const float color_kernel[9] = float[](-1.0, -1.0, -1.0, -1.0, 8.0, -1.0, -1.0, -1.0, -1.0);
+const float depth_kernel[9] = float[](1.0, 1.0, 1.0, 1.0, -8.0, 1.0, 1.0, 1.0, 1.0);
 
+#define DH_FRAG 1
+#define ENT_FRAG 2
 
 void main() {
-
     vec4 lightData = texture(colortex2,texCoord);
 
     float entity = texture2D(colortex3,texCoord).r;
@@ -47,59 +47,62 @@ void main() {
         color = texture(colortex0,texCoord);
         return;
     }
+    int type = 0;
+    if(entity > .005 && entity < 0.015) type = DH_FRAG;
+    if(entity > .05 && entity < 0.65) type = ENT_FRAG;
 
     //edge detection adapted from vector shaders by WoMspace (https://github.com/WoMspace/VECTOR/tree/main/shaders)
     //check color against line detector kernel
-	vec3 color_kernel = vec3(0.0);
+	vec3 color_vec = vec3(0.0);
     for(int y = 0; y < 3; y++) {
 		for(int x = 0; x < 3; x++) {
 			vec2 offset = pixelSize * vec2(x - 1, y - 1) * 1.0;
-			color_kernel += texture2D(colortex0, texCoord + offset).rgb * n[y * 3 + x];
+			color_vec += texture2D(colortex0, texCoord + offset).rgb * color_kernel[y * 3 + x];
 		}
 	}
-	color_kernel /= 4.5;
+	color_vec /= 4.5;
 
     //check depth against line detector kernel
 	float depth = 0.0;
 	for(int y = 0; y < 3; y++) {
 		for(int x = 0; x < 3; x++) {
 			vec2 offset = pixelSize * vec2(float(x) - 1.0, float(y) - 1.0) * 1.0;
-			float rawDepth = texture2D(depthtex0, texCoord + offset).r;
-			depth += linearizeDepth(rawDepth,near,far) * n[y * 3 + x];
+            float rawDepth = 0;
+            if(type == DH_FRAG) {
+                rawDepth = texture2D(colortex3, texCoord+offset).g;
+                depth += rawDepth * depth_kernel[y * 3 + x];
+            }
+            else {
+                rawDepth = texture2D(depthtex0, texCoord + offset).r;
+			    depth += linearizeDepth(rawDepth,near,far) * depth_kernel[y * 3 + x];
+            }
 		}
 	}
 	depth *= 0.8;
 
-    // check normal against line detector kernel
-	vec3 normal = vec3(0.0);
-	for(int y = 0; y < 3; y++) {
-		for(int x = 0; x < 3; x++) {
-			vec2 offset = pixelSize * vec2(x - 1, y - 1) * 1.0;
-			normal += texture2D(colortex4, texCoord + offset).rgb * n[y * 3 + x];
-		}
-	}
-    float grey = dot(color_kernel, vec3(0.21, 0.72, 0.07));
-	float normalGrey = dot(abs(normal), vec3(1.0));
+    float grey = dot(color_vec, vec3(0.21, 0.72, 0.07));
 
     // Set the color based on the edge intensity
 
-    if(entity > .005 && entity < 0.015) {   //boost distant horizons color
-        grey *= 4;
-    }
+    //special multipliers for different fragment types
+    if(type == ENT_FRAG) grey *= pow(ENTITY_COLOR_SENS,4);
+    if(type == DH_FRAG) grey *= pow(DH_COLOR_SENS,4);
+    if(type == ENT_FRAG) depth *= ENTITY_DEPTH_SENS;
+    if(type == DH_FRAG) depth *= DH_DEPTH_SENS;
 
     float sobelLine = grey > COLOR_SENS ? 1.0 : 0.0;          //color sensitivity
 	float depthLine = depth > DEPTH_SENS ? 1.0 : 0.0;         //depth sensitivity
-	float normalLine = normalGrey > NORM_SENS ? 1.0 : 0.0;    //normal sensitivity
-
-    // if(entity > .05 && entity < 0.65) normalLine = 0;
-
 
 	float edge_intensity = max(depthLine, sobelLine);
-	edge_intensity = max(edge_intensity, normalLine);
-    // float edge_intensity = depthLine;
-    edge_intensity *= pow(lightData.r,0.5);
 
-    //apply 
+    if(LIGHT_STYLE == 1){
+        edge_intensity *= pow(lightData.r,0.5 * LIGHT_FACTOR);
+    }
+    else if(LIGHT_STYLE == 2){
+        edge_intensity *= 1 - pow(lightData.r,0.5 * LIGHT_FACTOR);
+    }else if(LIGHT_STYLE == 3){
+        //nothing
+    }
 
     if (edge_intensity > 0.5) {// Edge detected
         if(entity > .05 && entity < 0.15) color = ENTITY_DEFAULT;
@@ -111,6 +114,6 @@ void main() {
         else color = TERRAIN;
     } 
  
-    color = mix(texture(colortex0,texCoord), vec4(color.rgb,1.0), color.a);
+    color = mix(texture(colortex0,texCoord), color, color.a);
     
 }

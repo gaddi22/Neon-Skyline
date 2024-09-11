@@ -1,19 +1,17 @@
 #version 460 compatibility
 
 //FSH runs for each "pixel"
-
 uniform sampler2D gtexture; //gives the textures for all objects
 uniform sampler2D lightmap; //texture of the lighting applied
 uniform float rainStrength;
 uniform float alphaTestRef;
-uniform sampler2D normals;
 
 in vec2 texCoord;
 in vec4 foliageColor;
 in vec2 lightMapCoords;
 
 // out vec4 fragColor;
-/* RENDERTARGETS: 0,2,3,4 */
+/* RENDERTARGETS: 0,2,3 */
 
 //entities
 #ifdef GBUFFERS_ENTITIES
@@ -68,10 +66,7 @@ void main() {
         entity = 1;
     #endif
 
-	vec3 normal = texture(normals, texCoord).xyz;
-
     gl_FragData[0] = outputColorData;           //original
     gl_FragData[1] = lightColorData;            //Alt lighting
-    gl_FragData[2] = vec4(entity,vec3(0.0));       //fragment type
-    gl_FragData[4] = vec4(normal,0.0);          //normal
+    gl_FragData[2] = vec4(entity,vec2(0.0),1.0);       //fragment type
 }

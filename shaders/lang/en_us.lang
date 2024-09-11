@@ -21,4 +21,15 @@ option.ENMY_COLOR_I = Enemy Intensity
 
 option.COLOR_SENS = Color Sensitivity
 option.DEPTH_SENS = Depth Sensitivity
-option.NORM_SENS = Normal Sensitivity
+
+option.ENTITY_COLOR_SENS = Entity Color Sensitivity
+option.ENTITY_DEPTH_SENS = Entity Depth Sensitivity
+option.DH_COLOR_SENS = Distant Horizons Color Sensitivity
+option.DH_DEPTH_SENS = Distant Horizons Depth Sensitivity
+
+option.LIGHT_STYLE = Light Style
+option.LIGHT_FACTOR = Light Sensitivity
+
+value.LIGHT_STYLE.1 = Dark
+value.LIGHT_STYLE.2 = Light
+value.LIGHT_STYLE.3 = All
