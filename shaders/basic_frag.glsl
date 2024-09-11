@@ -6,13 +6,14 @@ uniform sampler2D gtexture; //gives the textures for all objects
 uniform sampler2D lightmap; //texture of the lighting applied
 uniform float rainStrength;
 uniform float alphaTestRef;
+uniform sampler2D normals;
 
 in vec2 texCoord;
-in vec3 foliageColor;
+in vec4 foliageColor;
 in vec2 lightMapCoords;
 
 // out vec4 fragColor;
-/* RENDERTARGETS: 0,2,3 */
+/* RENDERTARGETS: 0,2,3,4 */
 
 //entities
 #ifdef GBUFFERS_ENTITIES
@@ -24,20 +25,14 @@ void main() {
 
     //lookup lightcolor in the light map and apply that color to the object
     //pow operations linearize the values
-    vec3 lightColor = pow(texture(lightmap,lightMapCoords).rgb,vec3(2.2));
-    vec3 lightIntensityVec = lightColor / vec3(1/2.2);
+    vec4 lightColor = pow(texture(lightmap,lightMapCoords),vec4(2.2));
+
+    vec4 lightIntensityVec = lightColor / vec4(1/2.2);  //we can use this intensity for edge detection
     float lightIntensity = (lightIntensityVec.r + lightIntensityVec.g + lightIntensityVec.b) / 3.0;
     float lightIntensityInv = 1 - lightIntensity;
 
     //apply colors from texture location
-    vec4 outputColorData = pow(texture(gtexture,texCoord),vec4(2.2));
-    vec3 outputColor = outputColorData.rgb * pow(foliageColor * lightColor,vec3(2.2));
-    float transparency = outputColorData.a;
-
-    //if transparency is low, throw this fragment out so the one behind can be drawn
-    if(transparency < alphaTestRef){
-        discard;
-    }
+    vec4 outputColorData = texture(gtexture,texCoord) * foliageColor * lightColor;
 
     float entity = 0;
     
@@ -46,8 +41,7 @@ void main() {
     #ifdef GBUFFERS_ENTITIES
 
         //Entity lighting
-        outputColor *= pow(shadow_light_strength,1/2.2);
-        if(entityMask == 5) transparency = 0.3; //shadow transparency
+        outputColorData.rgb = pow(pow(outputColorData.rgb,vec3(2.2)) * pow(shadow_light_strength,1/2.2),vec3(1/2.2));
 
         entity = 0.1;
         entity = entityMask == 1 ? 0.2 : entity; // Hostile mobs
@@ -60,22 +54,24 @@ void main() {
     #endif
     lightColorData =  vec4(lightIntensityInv);
 
+    //if transparency is low, throw this fragment out so the one behind can be drawn
+    if(outputColorData.a < alphaTestRef){
+        discard;
+    }
+
     #ifdef GBUFFERS_WEATHER 
         entity = 1;
-    #endif
-
-    #ifdef GBUFFERS_BEAM
-      transparency = 0.03;
     #endif
 
     //fade sun with rain
     #ifdef GBUFFERS_SKYTEXTURED
         entity = 1;
-        transparency *= (1/rainStrength) - 3;
     #endif
 
-    gl_FragData[0] = pow(vec4(outputColor,transparency),vec4(1/2.2));   //original
-    gl_FragData[1] = lightColorData;                                   //Alt lighting
-    gl_FragData[2] = vec4(entity,0.0,0.0,1.0);                          //entity data
+	vec3 normal = texture(normals, texCoord).xyz;
 
+    gl_FragData[0] = outputColorData;           //original
+    gl_FragData[1] = lightColorData;            //Alt lighting
+    gl_FragData[2] = vec4(entity,vec3(0.0));       //fragment type
+    gl_FragData[4] = vec4(normal,0.0);          //normal
 }

@@ -4,6 +4,7 @@
 //Position inputs start in model space while the render wants them in clip space
 
 //fttransform() is a shorthand to do this conversion
+uniform mat3 normalMatrix;;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 gbufferModelViewInverse;
@@ -15,7 +16,7 @@ in vec4 vaColor;    //Biome based colors
 in ivec2 vaUV2;     //lighting information, ivec is int instead of float
 
 out vec2 texCoord;
-out vec3 foliageColor; 
+out vec4 foliageColor; 
 out vec2 lightMapCoords;
 
 //Entity checking
@@ -30,7 +31,7 @@ flat out int entityMask;
 void main(){
 
     texCoord = vaUV0;       //pass texture locations to fragment
-    foliageColor = vaColor.rgb; //pass biome color to fragment
+    foliageColor = vaColor; //pass biome color to fragment
     lightMapCoords = vaUV2 * (1.0 / 256.0) + (1.0 / 32.0);
 
     //convert from model space to clip space
@@ -43,4 +44,5 @@ void main(){
     #else
 
 	#endif
+    
 }

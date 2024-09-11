@@ -11,6 +11,7 @@ uniform sampler2D depthtex0;
 uniform float viewHeight;
 uniform float viewWidth;
 uniform vec3 fogColor;
+// uniform sampler2D normals;
 
 in vec2 lightMapCoords;
 in vec4 blockColor;
@@ -55,10 +56,12 @@ void main() {
 
     fragColor = pow(vec4(outputColor, transparency),vec4(1.0 / 2.2));
 
-    outputColorData = vec4(lightColor,1.0);
+	// vec3 normal = texture(normals, texCoord).xyz;
+    float fragmentType = 0.01;
 
     gl_FragData[0] = pow(vec4(outputColor,transparency),vec4(1/2.2));   //original
-    gl_FragData[1] = outputColorData;                                   //custom
-    gl_FragData[2] = vec4(0.01,0.0,0.0,1.0);               //entity data
+    gl_FragData[1] = vec4(lightIntensityInv);                           //Light Data
+    gl_FragData[2] = vec4(fragmentType,vec3(0.0));                      //frag data
+    // gl_FragData[3] = vec4(normal,0.0);                                 //normal
 
 }

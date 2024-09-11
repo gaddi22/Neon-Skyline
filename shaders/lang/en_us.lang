@@ -18,6 +18,7 @@ option.ENMY_COLOR_R = Enemy Red
 option.ENMY_COLOR_G = Enemy Green
 option.ENMY_COLOR_B = Enemy Blue
 option.ENMY_COLOR_I = Enemy Intensity
-option.DH_SENS = Distant Horizons Outline Weight
-option.ENT_SENS = Entity Outline Weight
-option.GRND_SENS = Terrain Outline Weight
+
+option.COLOR_SENS = Color Sensitivity
+option.DEPTH_SENS = Depth Sensitivity
+option.NORM_SENS = Normal Sensitivity
