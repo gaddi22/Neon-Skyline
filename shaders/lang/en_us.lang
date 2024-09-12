@@ -33,3 +33,7 @@ option.LIGHT_FACTOR = Light Sensitivity
 value.LIGHT_STYLE.1 = Dark
 value.LIGHT_STYLE.2 = Light
 value.LIGHT_STYLE.3 = All
+
+option.THICKER_LINES = Thicker Lines
+value.THICKER_LINES.0 = Off
+value.THICKER_LINES.1 = On

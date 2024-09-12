@@ -1,3 +1,7 @@
+uniform float viewHeight;
+uniform float viewWidth;
+vec2 pixelSize = 1.0 / vec2(viewWidth, viewHeight);
+
 #define UNKN_COLOR_R 1.0 // [0.0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0]
 #define UNKN_COLOR_G 1.0 // [0.0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0]
 #define UNKN_COLOR_B 0.0 // [0.0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0]
@@ -47,3 +51,5 @@ const vec4 PKUP_COLOR = vec4(PKUP_COLOR_R, PKUP_COLOR_G, PKUP_COLOR_B, PKUP_COLO
 #define LIGHT_FACTOR 1.0 // [0 0.25 0.5 0.75 1.0 1.25 1.5 1.75 2.0 2.5 3.0 4.0]
 
 #define LIGHT_STYLE 1 // [1 2 3] - 1 makes edges dissapear as light increases. 2 makes edges depend on lighting. 3 makes lighting have no effect
+
+#define THICKER_LINES 1 // [0 1]

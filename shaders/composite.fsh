@@ -6,16 +6,18 @@ uniform sampler2D depthtex0;    //depthmap
 uniform sampler2D colortex0;    //vanilla-like
 uniform sampler2D colortex2;    //lighting/edge data
 uniform sampler2D colortex3;    //fragment type
-uniform float viewHeight;
-uniform float viewWidth;
 
 uniform float far;
 uniform float near;
 
 in vec2 texCoord;
 
+/* RENDERTARGETS: 0,2 */
+
 /* DRAWBUFFERS */
 layout(location = 0) out vec4 color;
+layout(location = 1) out vec4 detectionData;
+
 
 /*  Radar Colors */
 const float entity_min = 0.05;
@@ -26,8 +28,6 @@ vec4 PLAYER = PLYR_COLOR;
 vec4 FRIENDLY = FRND_COLOR;
 vec4 ENEMY = ENMY_COLOR;
 vec4 PICKUP = PKUP_COLOR;
-
-vec2 pixelSize = 1.0 / vec2(viewWidth, viewHeight);
 
 float linearizeDepth(float depth, float near, float far) {
     return (2.0 * near) / (far + near - depth * (far - near));
@@ -104,6 +104,7 @@ void main() {
         //nothing
     }
 
+    detectionData = vec4(0.0);
     if (edge_intensity > 0.5) {// Edge detected
         if(entity > .05 && entity < 0.15) color = ENTITY_DEFAULT;
         else if(entity > .15 && entity < 0.25)color = ENEMY;
@@ -112,6 +113,7 @@ void main() {
         else if(entity > .45 && entity < 0.55)color = PICKUP;
         else if(entity > .55 && entity < 0.65)color = vec4(0.0);    //shadow
         else color = TERRAIN;
+        detectionData.r = 1.0;
     } 
  
     color = mix(texture(colortex0,texCoord), color, color.a);
