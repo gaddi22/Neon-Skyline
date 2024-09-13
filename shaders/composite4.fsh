@@ -22,23 +22,19 @@ void main() {
     color = texture(colortex0, texCoord);
     vec4 e_l_Data = texture(colortex2, texCoord);
 
+    #ifdef EDGE_STATIC
     if(e_l_Data.r < 0.25){
         return;
     }
 
-    #ifdef EDGE_STATIC
     float noiseStrength = 0.1;
-
-    // Generate random noise for this pixel
     float noise = random(texCoord);
 
-    // Adjust noise strength based on the uniform input
+    // Adjust noise strength
     noise = (noise * 2.0 - 1.0) * noiseStrength * (e_l_Data.r + .25);
 
-    // Apply the noise to each color channel to create the static effect
-    vec3 staticColor = color.rgb + vec3(noise);
 
-    // Output the final color, clamping the values between 0 and 1 to avoid oversaturation
+    vec3 staticColor = color.rgb + vec3(noise);
     color = vec4(clamp(staticColor, 0.0, 1.0), color.a);
     #endif
 }
