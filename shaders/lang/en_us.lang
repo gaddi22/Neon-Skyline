@@ -37,3 +37,4 @@ value.LIGHT_STYLE.3 = All
 option.THICKER_LINES = Thicker Lines
 
 option.EDGE_BLOOM = Edge Bloom
+option.EDGE_STATIC = Edge Static

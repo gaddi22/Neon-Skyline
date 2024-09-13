@@ -116,6 +116,7 @@ void main() {
         detectionData.r = 1.0;
     } 
  
+    detectionData.g = lightData.r;
     color = mix(texture(colortex0,texCoord), color, color.a);
     
 }

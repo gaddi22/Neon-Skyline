@@ -22,6 +22,7 @@ vec2 getDirectionVector(float angle) {
 void main() {
     //ignore edges themselves
     vec4 thisEdgeData = texture(colortex2, texCoord);
+    detectionData = thisEdgeData;
     if(thisEdgeData.r > 0.5){
         color = texture(colortex0,texCoord);
         return;
@@ -71,7 +72,9 @@ void main() {
     if (closestDistance <= maxRadius) {
         float blendFactor = 0.75 - clamp(closestDistance/maxRadius,0.0,.75);
         color = mix(baseColor, edgeColor, blendFactor);
+        detectionData.r = blendFactor;
     } else {
         color = baseColor;  // No edge found, use the base color
     }
+    
 }
