@@ -11,6 +11,8 @@ uniform sampler2D depthtex0;
 uniform float viewHeight;
 uniform float viewWidth;
 uniform vec3 fogColor;
+uniform float fogStart;
+uniform float fogEnd;
 
 in vec2 lightMapCoords;
 in vec4 blockColor;
@@ -46,10 +48,17 @@ void main() {
     //fog effect
     float distanceFromCamera = distance(vec3(0), viewSpacePosition);
 
-    float maxFogDistance = 4000;
-    float minFogDistance = 100;
+    float maxFogDistance = fogEnd;
+    float minFogDistance = fogStart;
+
+    float maxDepthDistance = 4000;
+    float minDepthDistance = 80;
 
     float fogBlendValue = clamp((distanceFromCamera - minFogDistance)/ (maxFogDistance - minFogDistance),0,1);
+
+    float depthLineValue = clamp((distanceFromCamera - minDepthDistance)/ (maxDepthDistance - minDepthDistance),0,1);
+
+    if(depthLineValue < 0.01) discard;
 
     outputColor = mix(outputColor, pow(fogColor, vec3(2.2)), fogBlendValue);
 
@@ -59,6 +68,6 @@ void main() {
 
     gl_FragData[0] = pow(vec4(outputColor,transparency),vec4(1/2.2));   //original
     gl_FragData[1] = vec4(lightIntensityInv);                           //Light Data
-    gl_FragData[2] = vec4(fragmentType,fogBlendValue,vec2(0.0));   //frag data
+    gl_FragData[2] = vec4(fragmentType,depthLineValue,fogBlendValue,1.0);   //frag data
 
 }

@@ -1,5 +1,4 @@
 #version 460 
-
 //VSH files are processed per vertex. 
 //Position inputs start in model space while the render wants them in clip space
 
@@ -18,6 +17,7 @@ in ivec2 vaUV2;     //lighting information, ivec is int instead of float
 out vec2 texCoord;
 out vec4 foliageColor; 
 out vec2 lightMapCoords;
+out vec3 viewSpacePosition;
 
 //Entity checking
 #ifdef GBUFFERS_ENTITIES
@@ -37,7 +37,8 @@ void main(){
     //convert from model space to clip space
     // gl_Position = ftransform();
     gl_Position = projectionMatrix * modelViewMatrix * vec4(vaPosition + chunkOffset,1);   //gl_position: expected output of vsh file. position on screen //1: perspective
-    
+    viewSpacePosition = gl_Position.xyz;
+
     #ifdef GBUFFERS_ENTITIES
     shadow_light_strength = max(dot(shadowLightPosition, vec3(0, 1, 0)), 0.1);
 	entityMask = entityId;
