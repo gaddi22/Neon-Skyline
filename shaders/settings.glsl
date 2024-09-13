@@ -52,4 +52,6 @@ const vec4 PKUP_COLOR = vec4(PKUP_COLOR_R, PKUP_COLOR_G, PKUP_COLOR_B, PKUP_COLO
 
 #define LIGHT_STYLE 1 // [1 2 3] - 1 makes edges dissapear as light increases. 2 makes edges depend on lighting. 3 makes lighting have no effect
 
-#define THICKER_LINES 1 // [0 1]
+#define THICKER_LINES
+
+#define EDGE_BLOOM

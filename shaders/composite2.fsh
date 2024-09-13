@@ -18,7 +18,7 @@ void main() {
 	vec4 edgeColor = vec4(0.0);
 
 	// vec4 detectionData = texture(colortex2,texCoord);
-	#if THICKER_LINES == 1
+	#ifdef THICKER_LINES
 		vec4[4] adjacentDetection;
 		vec4[4] adjacentColor;
 		vec2 offset = pixelSize * vec2(0, 1);	//up
@@ -37,15 +37,11 @@ void main() {
 		for(int i = 0; i < 4; i++){
 			if(adjacentDetection[i].r > 0.5){
 				edgeColor = adjacentColor[i];
-				detectionData.g = 1.0;	//secondary detection
+				detectionData.r = 1.0;	//now this fragment is also an edge
 				break;
 			}
 		}
 
 	#endif
     color = mix(texture(colortex0,texCoord), edgeColor, edgeColor.a);
-
-	// if(edgeColor.a > 0.01) color = edgeColor;
-    // else color = texture(colortex0,texCoord);
-
 }
