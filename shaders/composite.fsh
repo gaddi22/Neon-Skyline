@@ -4,6 +4,7 @@
 
 uniform sampler2D depthtex0;    //depthmap
 uniform sampler2D colortex0;    //vanilla-like
+uniform sampler2D colortex4;    //normals
 uniform sampler2D colortex2;    //lighting/edge data
 uniform sampler2D colortex3;    //fragment type
 
@@ -41,8 +42,15 @@ const float depth_kernel[9] = float[](1.0, 1.0, 1.0, 1.0, -8.0, 1.0, 1.0, 1.0, 1
 
 void main() {
     vec4 lightData = texture(colortex2,texCoord);
+    vec4 colortex3_vec = texture2D(colortex3,texCoord);
+    float fogBlendValue = colortex3_vec.b;
 
-    float entity = texture2D(colortex3,texCoord).r;
+    if(fogBlendValue > 0.9){
+        color = mix(texture(colortex0,texCoord), color, color.a);
+        return;
+    }
+
+    float entity = colortex3_vec.r;
     if (entity > entity_max){ //things that should not be edgedetected (sky, weather)
         color = texture(colortex0,texCoord);
         return;
@@ -80,6 +88,16 @@ void main() {
 	}
 	depth *= 0.8;
 
+    //check normals
+    vec3 normal = vec3(0.0);
+	for(int y = 0; y < 3; y++) {
+		for(int x = 0; x < 3; x++) {
+			vec2 offset = pixelSize * vec2(x - 1, y - 1) * 1.0;
+			normal += texture2D(colortex4, texCoord + offset).rgb * depth_kernel[y * 3 + x];
+		}
+	}
+	float normalGrey = dot(abs(normal), vec3(1.0));
+
     float grey = dot(color_vec, vec3(0.21, 0.72, 0.07));
 
     // Set the color based on the edge intensity
@@ -92,8 +110,10 @@ void main() {
 
     float sobelLine = grey > COLOR_SENS ? 1.0 : 0.0;          //color sensitivity
 	float depthLine = depth > DEPTH_SENS ? 1.0 : 0.0;         //depth sensitivity
+	float normalLine = normalGrey > NORM_SENS ? 1.0 : 0.0;
 
 	float edge_intensity = max(depthLine, sobelLine);
+    edge_intensity = max(edge_intensity,normalLine);
 
     if(LIGHT_STYLE == 1){
         edge_intensity *= pow(lightData.r,0.5 * LIGHT_FACTOR);

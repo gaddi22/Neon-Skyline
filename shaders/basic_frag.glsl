@@ -14,9 +14,16 @@ in vec2 texCoord;
 in vec4 foliageColor;
 in vec2 lightMapCoords;
 in vec3 viewSpacePosition;
+in vec3 normal;
 
 // out vec4 fragColor;
-/* RENDERTARGETS: 0,2,3 */
+/* RENDERTARGETS: 0,4,2,3 */
+
+layout(location = 0) out vec4 color;
+layout(location = 1) out vec4 normalData;
+layout(location = 2) out vec4 lightColorData;
+layout(location = 3) out vec4 fragData;
+
 
 //entities
 #ifdef GBUFFERS_ENTITIES
@@ -25,17 +32,18 @@ flat in int entityMask;
 #endif
 
 void main() {
-
+    color = texture(gtexture,texCoord);
+    color.rgb = pow(color.rgb, vec3(2.2));
     //lookup lightcolor in the light map and apply that color to the object
     //pow operations linearize the values
     vec4 lightColor = pow(texture(lightmap,lightMapCoords),vec4(2.2));
 
-    vec4 lightIntensityVec = lightColor / vec4(1/2.2);  //we can use this intensity for edge detection
+    vec4 lightIntensityVec = lightColor;  //we can use this intensity for edge detection
     float lightIntensity = (lightIntensityVec.r + lightIntensityVec.g + lightIntensityVec.b) / 3.0;
     float lightIntensityInv = 1 - lightIntensity;
 
     //apply colors from texture location
-    vec4 outputColorData = texture(gtexture,texCoord) * foliageColor * lightColor;
+    color *= foliageColor * lightColor;
 
     float entity = 0;
     
@@ -44,7 +52,8 @@ void main() {
     #ifdef GBUFFERS_ENTITIES
 
         //Entity lighting
-        outputColorData.rgb = pow(pow(outputColorData.rgb,vec3(2.2)) * pow(shadow_light_strength,1/2.2),vec3(1/2.2));
+        color.rgb *= shadow_light_strength;
+        // outputColorData.rgb *= shadow_light_strength;
 
         entity = 0.1;
         entity = entityMask == 1 ? 0.2 : entity; // Hostile mobs
@@ -58,7 +67,7 @@ void main() {
     lightColorData =  vec4(lightIntensityInv);
 
     //if transparency is low, throw this fragment out so the one behind can be drawn
-    if(outputColorData.a < alphaTestRef){
+    if(color.a < alphaTestRef){
         discard;
     }
 
@@ -74,10 +83,9 @@ void main() {
         //fog
         float distanceFromCamera = distance(vec3(0), viewSpacePosition);
         fogBlendValue = clamp((distanceFromCamera - fogStart)/ (fogEnd - fogStart),0,1);
-        outputColorData.rgb = mix(outputColorData.rgb, fogColor, fogBlendValue);
+        color.rgb = mix(color.rgb, fogColor, fogBlendValue);
     #endif
 
-    gl_FragData[0] = outputColorData;           //original
-    gl_FragData[1] = lightColorData;            //Alt lighting
-    gl_FragData[2] = vec4(entity,0.0,fogBlendValue,1.0);       //fragment type
+    normalData = vec4(normal,(1.0));        //normal
+    fragData = vec4(entity,0.0,fogBlendValue,1.0);       //fragment type, fog
 }
