@@ -21,7 +21,6 @@ option.ENMY_COLOR_I = Enemy Intensity
 
 option.COLOR_SENS = Color Sensitivity
 option.DEPTH_SENS = Depth Sensitivity
-option.NORM_SENS = Normal Sensitivity
 
 option.ENTITY_COLOR_SENS = Entity Color Sensitivity
 option.ENTITY_DEPTH_SENS = Entity Depth Sensitivity
