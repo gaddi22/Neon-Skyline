@@ -45,7 +45,7 @@ void main(){
 
     #ifdef GBUFFERS_ENTITIES
     normal = normalMatrix*vaNormal;
-    shadow_light_strength = max(dot(vaNormal, vec3(0, 1, 0)), 0.05);
+    shadow_light_strength = max(dot(vaNormal, vec3(0, 1, 0)), 0.1);
 
 	entityMask = entityId;
     #else
