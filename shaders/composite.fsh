@@ -93,7 +93,7 @@ void main() {
 	for(int y = 0; y < 3; y++) {
 		for(int x = 0; x < 3; x++) {
 			vec2 offset = pixelSize * vec2(x - 1, y - 1) * 1.0;
-			normal += texture2D(colortex4, texCoord + offset).rgb * color_kernel[y * 3 + x];
+			normal += texture2D(colortex4, texCoord + offset).rgb * depth_kernel[y * 3 + x];
 		}
 	}
 	float normalGrey = dot(abs(normal), vec3(1.0));
