@@ -2,39 +2,47 @@
 
 #include "settings.glsl"
 
-//static Layer
+//Bloom tall layer
 
 in vec2 texCoord;
 uniform sampler2D colortex0;    //vanilla-like
-uniform sampler2D colortex2;    //edgeData, lightData
-uniform float frameTimeCounter;
+uniform sampler2D colortex2;    //edge data
+uniform sampler2D colortex3;    //edge blending
 
-/* RENDERTARGETS: 0,2 */
+/* RENDERTARGETS: 0,2,3 */
 layout(location = 0) out vec4 color;
+layout(location = 1) out vec4 detectionData;
+layout(location = 2) out vec4 edge_blend;
 
-// random pixel noiose based on time
-float random(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123 + frameTimeCounter);
-}
+const float search_kernel[] = float[](0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 0.5, 0.4, 0.3, 0.2, 0.1);
+// const float search_kernel[] = float[](0.9, 0.9, 0.9, 0.9, 0.5, 1.0, 0.5, 0.9, 0.9, 0.9, 0.9);
+
 
 void main() {
-    
+    // Read the base color from colortex0
     color = texture(colortex0, texCoord);
-    vec4 e_l_Data = texture(colortex2, texCoord);
 
-    #ifdef EDGE_STATIC
-    if(e_l_Data.r < 0.25){
+    //ignore edges themselves
+    detectionData = texture(colortex2, texCoord);
+    if(detectionData.r == 1.0){
         return;
     }
 
-    float noiseStrength = 0.1;
-    float noise = random(texCoord);
-
-    // Adjust noise strength
-    noise = (noise * 2.0 - 1.0) * noiseStrength * (e_l_Data.r + .25);
-
-
-    vec3 staticColor = color.rgb + vec3(noise);
-    color = vec4(clamp(staticColor, 0.0, 1.0), color.a);
+    #ifndef EDGE_BLOOM
+    return;
     #endif
+
+    edge_blend = texture(colortex3,texCoord);
+    for(int i = 0; i < 11; i++){
+        vec2 offset = pixelSize * vec2(0,i - 5);
+
+        float sample_edge_data = texture(colortex2,texCoord + offset).r;
+        vec4 sample_color = texture(colortex0, texCoord + offset);
+
+        detectionData.r = mix(detectionData.r, sample_edge_data.r, search_kernel[i] * sample_edge_data.r);
+
+        edge_blend = mix(edge_blend, sample_color, search_kernel[i] * sample_edge_data.r);
+    
+    }
+    
 }

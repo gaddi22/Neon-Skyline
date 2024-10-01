@@ -2,79 +2,46 @@
 
 #include "settings.glsl"
 
-//Bloom Layer
+//Bloom wide layer
 
 in vec2 texCoord;
 uniform sampler2D colortex0;    //vanilla-like
 uniform sampler2D colortex2;    //edge data
 
-
-/* RENDERTARGETS: 0,2 */
+/* RENDERTARGETS: 0,2,3 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec4 detectionData;
+layout(location = 2) out vec4 edge_blend;
 
+const float search_kernel[] = float[](0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 0.5, 0.4, 0.3, 0.2, 0.1);
+// const float search_kernel[] = float[](0.9, 0.9, 0.9, 0.9, 0.5, 1.0, 0.5, 0.9, 0.9, 0.9, 0.9);
 
-// Function to compute the direction vectors for circular expansion
-vec2 getDirectionVector(float angle) {
-    return vec2(cos(angle), sin(angle));
-}
 
 void main() {
+    // Read the base color from colortex0
+    color = texture(colortex0, texCoord);
+    edge_blend = vec4(0.0);
+
     //ignore edges themselves
-    vec4 thisEdgeData = texture(colortex2, texCoord);
-    detectionData = thisEdgeData;
-    if(thisEdgeData.r > 0.5){
-        color = texture(colortex0,texCoord);
+    detectionData = texture(colortex2, texCoord);
+    if(detectionData.r > 0.5){
         return;
     }
 
     #ifndef EDGE_BLOOM
-    else{
-        color = texture(colortex0,texCoord);
-        return;
-    }
+    return;
     #endif
 
-// Read the base color from colortex0
-    vec4 baseColor = texture(colortex0, texCoord);
-    vec4 edgeColor = vec4(0.0);
+    for(int i = 0; i < 11; i++){
+        vec2 offset = pixelSize * vec2(i - 5, 0);
 
-    int maxRadius = 10;
-    float closestDistance = maxRadius + 1.0;
+        float sample_edge_data = texture(colortex2,texCoord + offset).r;
+        vec4 sample_color = texture(colortex0, texCoord + offset);
 
-    // search from pixel outwards
-    for (float r = 1.0; r <= maxRadius; r++) {
-        // Calculate the number of samples for this radius
-        int samples = int(2.0 * 3.141592 * r);
-        
-        // Loop over the samples (points on the circle)
-        for (int i = 0; i < samples; i++) {
+        detectionData.r = mix(detectionData.r, sample_edge_data.r, search_kernel[i] * sample_edge_data.r);
 
-            float angle = (float(i) / float(samples)) * 2.0 * 3.141592;  // Calculate the angle for this sample
-            vec2 direction = getDirectionVector(angle);  // Get the direction vector for this angle
-            vec2 offset = direction * r * pixelSize;     // Offset by the radius and pixel size
-            vec4 edgeData = texture(colortex2, texCoord + offset);  // Sample the edge texture at the offset
-            
-            // edge found
-            if (edgeData.r > 0.5) {
-                closestDistance = r;   // Save the distance
-                edgeColor = texture(colortex0, texCoord + offset);
-                break;
-            }
-        }
+        edge_blend = mix(edge_blend, sample_color, search_kernel[i] * sample_edge_data.r);
 
-        if (closestDistance <= r) {
-            break;  // Edge is found, stop searching
-        }
-    }
-
-    // Blend the colors based on the distance to the closest edge
-    if (closestDistance <= maxRadius) {
-        float blendFactor = 0.75 - clamp(closestDistance/maxRadius,0.0,.75);
-        color = mix(baseColor, edgeColor, blendFactor);
-        detectionData.r = blendFactor;
-    } else {
-        color = baseColor;  // No edge found, use the base color
     }
     
 }
