@@ -3,7 +3,8 @@
 //Position inputs start in model space while the render wants them in clip space
 
 //fttransform() is a shorthand to do this conversion
-uniform mat3 normalMatrix;;
+uniform vec3 cameraPosition;
+uniform mat3 normalMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 gbufferModelViewInverse;
@@ -13,20 +14,23 @@ in vec3 vaPosition; //vertex position
 in vec2 vaUV0;      //texture coordinates
 in vec4 vaColor;    //Biome based colors
 in ivec2 vaUV2;     //lighting information, ivec is int instead of float
+in vec3 vaNormal;
 
 out vec2 texCoord;
 out vec4 foliageColor; 
 out vec2 lightMapCoords;
 out vec3 viewSpacePosition;
 
+
 //Entity checking
 #ifdef GBUFFERS_ENTITIES
 uniform int entityId;
-in uniform vec3 shadowLightPosition;
 
 out float shadow_light_strength;
 flat out int entityMask;
 #endif
+
+out vec3 normal;
 
 void main(){
 
@@ -40,10 +44,13 @@ void main(){
     viewSpacePosition = gl_Position.xyz;
 
     #ifdef GBUFFERS_ENTITIES
-    shadow_light_strength = max(dot(shadowLightPosition, vec3(0, 1, 0)), 0.1);
+    normal = normalMatrix*vaNormal;
+    shadow_light_strength = max(dot(vaNormal, vec3(0, 1, 0)), 0.05);
+
 	entityMask = entityId;
     #else
+    normal = normalMatrix * vaNormal;
 
 	#endif
-    
+
 }

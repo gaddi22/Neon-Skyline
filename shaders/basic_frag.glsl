@@ -14,9 +14,14 @@ in vec2 texCoord;
 in vec4 foliageColor;
 in vec2 lightMapCoords;
 in vec3 viewSpacePosition;
+in vec3 normal;
 
 // out vec4 fragColor;
-/* RENDERTARGETS: 0,2,3 */
+/* RENDERTARGETS: 0,2,3,4 */
+layout(location = 0) out vec4 color;
+layout(location = 1) out vec4 lightColorData;
+layout(location = 2) out vec4 fragData;
+layout(location = 3) out vec4 normalData;
 
 //entities
 #ifdef GBUFFERS_ENTITIES
@@ -38,8 +43,6 @@ void main() {
     vec4 outputColorData = texture(gtexture,texCoord) * foliageColor * lightColor;
 
     float entity = 0;
-    
-    vec4 lightColorData;
 
     #ifdef GBUFFERS_ENTITIES
 
@@ -67,7 +70,6 @@ void main() {
     #endif
 
     float fogBlendValue = 0;
-    //fade sun with rain
     #ifdef GBUFFERS_SKYTEXTURED
         entity = 1;
     #else
@@ -77,7 +79,7 @@ void main() {
         outputColorData.rgb = mix(outputColorData.rgb, fogColor, fogBlendValue);
     #endif
 
-    gl_FragData[0] = outputColorData;           //original
-    gl_FragData[1] = lightColorData;            //Alt lighting
-    gl_FragData[2] = vec4(entity,0.0,fogBlendValue,1.0);       //fragment type
+    color = outputColorData;           //original
+    normalData = vec4(normal,1.0);
+    fragData = vec4(entity,0.0,fogBlendValue,1.0);       //fragment type
 }
