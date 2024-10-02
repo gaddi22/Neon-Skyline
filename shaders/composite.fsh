@@ -41,6 +41,9 @@ const float depth_kernel[9] = float[](1.0, 1.0, 1.0, 1.0, -8.0, 1.0, 1.0, 1.0, 1
 #define ENT_FRAG 2
 
 void main() {
+    // color = texture(colortex4,texCoord);
+    // return;
+
     vec4 lightData = texture(colortex2,texCoord);
     vec4 colortex3_vec = texture2D(colortex3,texCoord);
     float fogBlendValue = colortex3_vec.b;

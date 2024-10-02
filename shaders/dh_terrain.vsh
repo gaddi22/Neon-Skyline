@@ -7,12 +7,11 @@ out vec4 blockColor;
 out vec3 viewSpacePosition;
 out vec2 lightMapCoords;
 
-in vec3 vaNormal;
 out vec3 normal;
 
 void main(){
 
-    normal = vaNormal;
+    normal = gl_NormalMatrix * gl_Normal;
     blockColor = gl_Color;  //pass color to fragment
     lightMapCoords = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
 

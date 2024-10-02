@@ -70,6 +70,6 @@ void main() {
     gl_FragData[0] = pow(vec4(outputColor,transparency),vec4(1/2.2));   //original
     gl_FragData[1] = vec4(lightIntensityInv);                           //Light Data
     gl_FragData[2] = vec4(fragmentType,depthLineValue,fogBlendValue,1.0);   //frag data
-    gl_FragData[3] = vec4(normal,1.0);   //frag data
+    gl_FragData[3] = vec4(normal,1.0);   //normal data
 
 }
