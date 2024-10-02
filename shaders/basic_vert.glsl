@@ -44,12 +44,15 @@ void main(){
     viewSpacePosition = gl_Position.xyz;
 
     #ifdef GBUFFERS_ENTITIES
-    normal = normalMatrix*vaNormal;
+    // normal = normalMatrix*vaNormal;
+    normal = vaNormal;
+
     shadow_light_strength = max(dot(vaNormal, vec3(0, 1, 0)), 0.1);
 
 	entityMask = entityId;
     #else
-    normal = normalMatrix * vaNormal;
+    // normal = normalMatrix * vaNormal;
+    normal = vaNormal;
 
 	#endif
 

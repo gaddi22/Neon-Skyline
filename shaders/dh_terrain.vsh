@@ -11,7 +11,8 @@ out vec3 normal;
 
 void main(){
 
-    normal = gl_NormalMatrix * gl_Normal;
+    // normal = gl_NormalMatrix * gl_Normal;
+    normal = gl_Normal;
     blockColor = gl_Color;  //pass color to fragment
     lightMapCoords = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
 
