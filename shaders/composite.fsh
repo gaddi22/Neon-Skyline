@@ -60,15 +60,6 @@ void main() {
     if(entity > .005 && entity < 0.015) type = DH_FRAG;
     if(entity > .05 && entity < 0.65) type = ENT_FRAG;
 
-
-    // if(type == DH_FRAG){
-    //     color = vec4(texture2D(colortex3, texCoord).g + 1,0.0,0.0,1.0);
-    // }
-    // else{
-    //     color = vec4(texture2D(depthtex0, texCoord).r,0.0,0.0,1.0);
-    // }
-    // return;
-
     //edge detection adapted from vector shaders by WoMspace (https://github.com/WoMspace/VECTOR/tree/main/shaders)
     //check color against line detector kernel
 	vec3 color_vec = vec3(0.0);
@@ -121,9 +112,6 @@ void main() {
 		}
 	}
 	float normalGrey = max(dot(abs(normal), vec3(1.0)),4 * dot((normal), vec3(1.0)));
-	// float normalGrey = dot(abs(normal), vec3(1.0));
-	// float normalGrey = dot((normal), vec3(1.0));
-
 
     float grey = dot(color_vec, vec3(0.21, 0.72, 0.07));
 

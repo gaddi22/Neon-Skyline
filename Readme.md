@@ -4,6 +4,4 @@ This is a minecraft shader which adds customizable edges to blocks and entities.
 
 #TODO:
 
-- Fix DH border
-
 - Helmet overlay (low priority)
