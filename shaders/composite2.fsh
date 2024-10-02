@@ -17,7 +17,7 @@ layout(location = 1) out vec4 detectionData;
 void main() {
 	vec4 edgeColor = vec4(0.0);
 
-	// vec4 detectionData = texture(colortex2,texCoord);
+	detectionData = texture(colortex2,texCoord);
 	#ifdef THICKER_LINES
 		vec4[4] adjacentDetection;
 		vec4[4] adjacentColor;

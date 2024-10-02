@@ -130,7 +130,7 @@ void main() {
         //nothing
     }
 
-    detectionData = vec4(0.0);
+    detectionData = vec4(vec3(0.0),1.0);
     if (edge_intensity > 0.5) {// Edge detected
         if(entity > .05 && entity < 0.15) color = ENTITY_DEFAULT;
         else if(entity > .15 && entity < 0.25)color = ENEMY;

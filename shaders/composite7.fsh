@@ -22,8 +22,11 @@ void main() {
     color = texture(colortex0, texCoord);
     vec4 e_l_Data = texture(colortex2, texCoord);
 
+    // color = e_l_Data;
+    // return;
+
     #ifdef EDGE_STATIC
-    if(e_l_Data.r < 0.01){
+    if(e_l_Data.r < 0.1){
         return;
     }
 
