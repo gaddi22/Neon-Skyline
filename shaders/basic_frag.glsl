@@ -58,7 +58,7 @@ void main() {
 
 
     #endif
-    lightColorData =  vec4(lightIntensityInv);
+    lightColorData =  vec4(lightIntensityInv,0.0,0.0,1.0);
 
     //if transparency is low, throw this fragment out so the one behind can be drawn
     if(outputColorData.a < alphaTestRef){

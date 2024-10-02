@@ -41,8 +41,6 @@ const float depth_kernel[9] = float[](1.0, 1.0, 1.0, 1.0, -8.0, 1.0, 1.0, 1.0, 1
 #define ENT_FRAG 2
 
 void main() {
-    // color = texture(colortex4,texCoord);
-    // return;
 
     vec4 lightData = texture(colortex2,texCoord);
     vec4 colortex3_vec = texture2D(colortex3,texCoord);
@@ -62,6 +60,15 @@ void main() {
     if(entity > .005 && entity < 0.015) type = DH_FRAG;
     if(entity > .05 && entity < 0.65) type = ENT_FRAG;
 
+
+    // if(type == DH_FRAG){
+    //     color = vec4(texture2D(colortex3, texCoord).g + 1,0.0,0.0,1.0);
+    // }
+    // else{
+    //     color = vec4(texture2D(depthtex0, texCoord).r,0.0,0.0,1.0);
+    // }
+    // return;
+
     //edge detection adapted from vector shaders by WoMspace (https://github.com/WoMspace/VECTOR/tree/main/shaders)
     //check color against line detector kernel
 	vec3 color_vec = vec3(0.0);
@@ -79,14 +86,28 @@ void main() {
 		for(int x = 0; x < 3; x++) {
 			vec2 offset = pixelSize * vec2(float(x) - 1.0, float(y) - 1.0) * 1.0;
             float rawDepth = 0;
-            if(type == DH_FRAG) {
+            
+            float sample_type = texture2D(colortex3,texCoord + offset).r;
+
+            //prevent edges between DH and normal land
+            if(sample_type > .005 && sample_type < 0.015) sample_type = DH_FRAG;
+            
+            if(sample_type == DH_FRAG) {
                 rawDepth = texture2D(colortex3, texCoord+offset).g;
-                depth += rawDepth * depth_kernel[y * 3 + x];
+
             }
             else {
+
                 rawDepth = texture2D(depthtex0, texCoord + offset).r;
-			    depth += linearizeDepth(rawDepth,near,far) * depth_kernel[y * 3 + x];
+                rawDepth = linearizeDepth(rawDepth,near,far);
+
+                //add offset to bring DH depth close to the normal terrain depth
+                if(type == DH_FRAG) rawDepth -= 1;
+
             }
+
+            depth += rawDepth * depth_kernel[y * 3 + x];
+
 		}
 	}
 	depth *= 0.8;
