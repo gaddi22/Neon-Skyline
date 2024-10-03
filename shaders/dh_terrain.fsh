@@ -2,14 +2,14 @@
 
 //FSH runs for each "pixel"
 
+#include "settings.glsl"
+
 //Drawbuffers store data for our shader going forward\
 /* RENDERTARGETS: 0,2,3,4 */
 out vec4 fragColor;
 
 uniform sampler2D lightmap; //texture of the lighting applied
 uniform sampler2D depthtex0;
-uniform float viewHeight;
-uniform float viewWidth;
 uniform vec3 fogColor;
 uniform float fogStart;
 uniform float fogEnd;
@@ -24,6 +24,9 @@ void main() {
     //lookup lightcolor in the light map and apply that color to the object
     //pow operations linearize the values
     vec3 lightColor = pow(texture(lightmap,lightMapCoords).rgb,vec3(2.2));
+
+    lightColor = max(lightColor,ambient_min.rgb);
+
     vec3 lightIntensityVec = lightColor / vec3(1/2.2);
     float lightIntensity = ((lightIntensityVec.r + lightIntensityVec.g + lightIntensityVec.b) / 3.0);
     float lightIntensityInv = 1 - lightIntensity;

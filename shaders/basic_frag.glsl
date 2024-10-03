@@ -1,5 +1,7 @@
 #version 460 compatibility
 
+#include "settings.glsl"
+
 //FSH runs for each "pixel"
 uniform sampler2D gtexture; //gives the textures for all objects
 uniform sampler2D lightmap; //texture of the lighting applied
@@ -34,6 +36,7 @@ void main() {
     //lookup lightcolor in the light map and apply that color to the object
     //pow operations linearize the values
     vec4 lightColor = pow(texture(lightmap,lightMapCoords),vec4(2.2));
+    lightColor.rgb = max(lightColor.rgb,ambient_min.rgb);
 
     vec4 lightIntensityVec = lightColor / vec4(1/2.2);  //we can use this intensity for edge detection
     float lightIntensity = (lightIntensityVec.r + lightIntensityVec.g + lightIntensityVec.b) / 3.0;

@@ -2,6 +2,9 @@ uniform float viewHeight;
 uniform float viewWidth;
 vec2 pixelSize = 1.0 / vec2(viewWidth, viewHeight);
 
+uniform float screenBrightness;
+vec3 ambient_min = vec3(0.1,0.1,0.1) * (screenBrightness);
+
 #define UNKN_COLOR_R 1.0 // [0.0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0]
 #define UNKN_COLOR_G 1.0 // [0.0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0]
 #define UNKN_COLOR_B 0.0 // [0.0 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1.0]
