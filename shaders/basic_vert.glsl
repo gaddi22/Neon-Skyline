@@ -47,7 +47,12 @@ void main(){
     // normal = normalMatrix*vaNormal;
     normal = vaNormal;
 
-    shadow_light_strength = max(dot(vaNormal, vec3(0, 1, 0)), 0.1);
+    //entities are brightest on top, brighter in z directions, and darker in x directions
+    const float light_dir_min = 0.02;
+    shadow_light_strength = max(dot(vaNormal, vec3(0, 6.00, 0)), light_dir_min) + 
+                        max(dot(vaNormal, vec3(0, 0, 0.95)), light_dir_min) + 
+                        max(dot(vaNormal, vec3(0, 0, -0.95)), light_dir_min);
+    shadow_light_strength = clamp(shadow_light_strength / 3.0, light_dir_min+0.03, 1.0);
 
 	entityMask = entityId;
     #else
