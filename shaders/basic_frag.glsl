@@ -10,7 +10,7 @@ uniform float alphaTestRef;
 uniform vec3 fogColor;
 uniform float fogStart;
 uniform float fogEnd;
-
+uniform sampler2D colortex5;    // lightmap alt
 
 in vec2 texCoord;
 in vec4 foliageColor;
@@ -36,6 +36,12 @@ void main() {
     //lookup lightcolor in the light map and apply that color to the object
     //pow operations linearize the values
     vec4 lightColor = pow(texture(lightmap,lightMapCoords),vec4(2.2));
+
+    //get a second opinion from the lightmap texture. Sometimes the lightmap is pure white when it shouldn't be.
+    if(lightColor.r == 1.0 && lightColor.g == 1.0 && lightColor.b == 1.0){
+        lightColor = pow(texture(colortex5,lightMapCoords),vec4(2.2));
+    }
+
     lightColor.rgb = max(lightColor.rgb,ambient_min.rgb);
 
     vec4 lightIntensityVec = lightColor / vec4(1/2.2);  //we can use this intensity for edge detection

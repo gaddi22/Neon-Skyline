@@ -10,6 +10,8 @@ out vec4 fragColor;
 
 uniform sampler2D lightmap; //texture of the lighting applied
 uniform sampler2D depthtex0;
+uniform sampler2D colortex5;    // lightmap alt
+
 uniform vec3 fogColor;
 uniform float fogStart;
 uniform float fogEnd;
@@ -24,6 +26,11 @@ void main() {
     //lookup lightcolor in the light map and apply that color to the object
     //pow operations linearize the values
     vec3 lightColor = pow(texture(lightmap,lightMapCoords).rgb,vec3(2.2));
+
+    //get a second opinion from the lightmap texture. Sometimes the lightmap is pure white when it shouldn't be.
+    if((lightColor.r == 1.0 && lightColor.g == 1.0 && lightColor.b == 1.0) || (lightColor.r == 0.0 && lightColor.g == 0.0 && lightColor.b == 0.0)){
+        lightColor = pow(texture(colortex5,lightMapCoords).rgb,vec3(2.2));
+    }
 
     lightColor = max(lightColor,ambient_min.rgb);
 
