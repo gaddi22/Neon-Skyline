@@ -111,7 +111,8 @@ void main() {
 			normal += texture2D(colortex4, texCoord + offset).rgb * color_kernel[y * 3 + x];
 		}
 	}
-	float normalGrey = max(dot(abs(normal), vec3(1.0)),4 * dot((normal), vec3(1.0)));
+	// float normalGrey = max(dot(abs(normal), vec3(1.0)),4 * dot((normal), vec3(1.0)));
+    float normalGrey = dot(normal, normal); // length squared
 
     float grey = dot(color_vec, vec3(0.21, 0.72, 0.07));
 
@@ -122,6 +123,8 @@ void main() {
     if(type == DH_FRAG) grey *= pow(DH_COLOR_SENS,4);
     if(type == ENT_FRAG) depth *= ENTITY_DEPTH_SENS;
     if(type == DH_FRAG) depth *= DH_DEPTH_SENS;
+    if(type == ENT_FRAG) normalGrey *= ENTITY_NORM_SENS;
+    // if(type == DH_FRAG) depth *= DH_NORM_SENS;
 
     float sobelLine = grey > COLOR_SENS ? 1.0 : 0.0;          //color sensitivity
 	float depthLine = depth > DEPTH_SENS ? 1.0 : 0.0;         //depth sensitivity

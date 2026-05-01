@@ -25,6 +25,7 @@ option.NORM_SENS = Normal Sensitivity
 
 option.ENTITY_COLOR_SENS = Entity Color Sensitivity
 option.ENTITY_DEPTH_SENS = Entity Depth Sensitivity
+option.ENTITY_NORM_SENS = Entity Normal Sensitivity
 option.DH_COLOR_SENS = Distant Horizons Color Sensitivity
 option.DH_DEPTH_SENS = Distant Horizons Depth Sensitivity
 
